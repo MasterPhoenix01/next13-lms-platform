@@ -36,11 +36,13 @@ export const getDashboardCourses = async (userId: string): Promise<DashboardCour
 
     const courses = purchasedCourses.map((purchase) => purchase.course) as CourseWithProgressWithCategory[];
 
-    for (let course of courses) {
+   
+    const progressPromises = courses.map(async (course) => {
       const progress = await getProgress(userId, course.id);
       course["progress"] = progress;
-    }
-
+    });
+    
+    await Promise.all(progressPromises);
     const completedCourses = courses.filter((course) => course.progress === 100);
     const coursesInProgress = courses.filter((course) => (course.progress ?? 0) < 100);
 
